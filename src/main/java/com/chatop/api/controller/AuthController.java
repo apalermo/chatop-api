@@ -3,6 +3,7 @@ package com.chatop.api.controller;
 import com.chatop.api.dto.LoginRequest;
 import com.chatop.api.dto.RegisterRequest;
 import com.chatop.api.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,9 +21,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        authService.register(request);
-        return ResponseEntity.ok("User registered successfully");
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
+        String token = authService.register(request);
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
     @PostMapping("/login")
@@ -31,7 +32,7 @@ public class AuthController {
         String token = authService.login(request);
 
         // On le renvoie dans un JSON
-        return ResponseEntity.ok(Map.of("jwt", token));
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
 }

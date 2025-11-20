@@ -20,10 +20,11 @@ public class AuthService {
     private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public void register(RegisterRequest request) {
+    public String register(RegisterRequest request) {
         // On transforme le DTO en Entité (Mapping manuel)
+        String email = request.getEmail();
         User user = new User();
-        user.setEmail(request.getEmail());
+        user.setEmail(email);
         user.setName(request.getName());
 
         // On crypte le mot de passe (Impératif de sécurité)
@@ -31,6 +32,8 @@ public class AuthService {
 
         // On sauvegarde en base
         userRepository.save(user);
+
+        return jwtService.generateToken(email);
     }
 
 

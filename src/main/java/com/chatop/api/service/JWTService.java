@@ -17,8 +17,8 @@ public class JWTService {
     @Value("${chatop.app.jwtSecret}")
     private String secretKey;
 
-    public String generateToken(Authentication authentication) {
-        String email = authentication.getName();
+    public String generateToken(String email) {
+
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24h
 
@@ -28,6 +28,12 @@ public class JWTService {
                 .setExpiration(expiryDate)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // on surcharge la fonction pour qu'elle accepte une authentication (en plus de l'email)
+    public String generateToken(Authentication authentication){
+        String email = authentication.getName();
+        return generateToken(email);
     }
 
     private Key getSignInKey() {
