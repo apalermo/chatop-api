@@ -4,10 +4,7 @@ import com.chatop.api.dto.RentalDto;
 import com.chatop.api.service.RentalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,4 +28,11 @@ public class RentalController {
         RentalDto rental = rentalService.getRentalById(id);
         return ResponseEntity.ok(rental);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Map<String, String>> updateRental(@PathVariable Long id, @ModelAttribute RentalDto rentalDto) {
+        rentalService.updateRental(id, rentalDto);
+        return ResponseEntity.ok(Map.of("message", "Rental updated !"));
+    }
+
 }

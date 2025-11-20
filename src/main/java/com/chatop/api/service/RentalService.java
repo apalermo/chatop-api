@@ -27,6 +27,21 @@ public class RentalService {
         return mapToDto(rental);
     }
 
+    public void updateRental(Long id, RentalDto rentalDto) {
+        Rental rental = rentalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rental not found"));
+
+        // On met à jour uniquement les champs modifiables
+        rental.setName(rentalDto.getName());
+        rental.setSurface(rentalDto.getSurface());
+        rental.setPrice(rentalDto.getPrice());
+        rental.setDescription(rentalDto.getDescription());
+
+        // Note : On ne touche pas à l'image, au propriétaire ou à la date de création ici
+
+        rentalRepository.save(rental);
+    }
+
     // Méthode utilitaire pour transformer l'entité en DTO
     private RentalDto mapToDto(Rental rental) {
         RentalDto dto = new RentalDto();
