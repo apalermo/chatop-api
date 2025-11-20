@@ -2,14 +2,15 @@ package com.chatop.api.controller;
 
 import com.chatop.api.dto.LoginRequest;
 import com.chatop.api.dto.RegisterRequest;
+import com.chatop.api.dto.UserDto;
+import com.chatop.api.repository.UserRepository;
 import com.chatop.api.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
@@ -28,11 +30,15 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
-        // On appelle le service qui nous renvoie le token
         String token = authService.login(request);
-
-        // On le renvoie dans un JSON
         return ResponseEntity.ok(Map.of("token", token));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDto userDto = authService.getCurrentUser(authentication.getName());
+        return ResponseEntity.ok(userDto);
     }
 
 }

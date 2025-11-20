@@ -1,6 +1,7 @@
 package com.chatop.api.service;
 
 import com.chatop.api.dto.LoginRequest;
+import com.chatop.api.dto.UserDto;
 import org.springframework.security.authentication.AuthenticationManager;
 import com.chatop.api.dto.RegisterRequest;
 import com.chatop.api.model.User;
@@ -8,6 +9,7 @@ import com.chatop.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,22 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        // Si on passe l'étape 1, on génère le token.
+        // Si on passe l'étape précédente, on génère le token.
         return jwtService.generateToken(authentication);
+    }
+
+    public UserDto getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Mapping manuel (ou via Mapper)
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setEmail(user.getEmail());
+        userDto.setCreatedAt(user.getCreatedAt());
+        userDto.setUpdatedAt(user.getUpdatedAt());
+
+        return userDto;
     }
 }
