@@ -46,3 +46,7 @@ Desktop.ini
 ### Logs ###
 *.log
 logs/
+
+### pictures ###
+src/main/resources/static/images/*
+!src/main/resources/static/images/.gitkeep
