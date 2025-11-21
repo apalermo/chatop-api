@@ -46,7 +46,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwt);
+        try {
+            userEmail = jwtService.extractUsername(jwt);
+        } catch (Exception e) {
+            // Le token est invalide (malformé, expiré, etc.)
+            // On ne fait rien et on laisse la requête continuer sans authentification
+            // Si la route est protégée, Spring renverra une 401/403 plus tard.
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // On ne procède à l'authentification que si l'utilisateur n'est pas déjà authentifié
         // dans le contexte courant (évite de refaire le travail inutilement).

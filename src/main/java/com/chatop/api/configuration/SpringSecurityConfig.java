@@ -1,5 +1,6 @@
 package com.chatop.api.configuration;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +35,15 @@ public class SpringSecurityConfig {
                         // Les routes d'authentification doivent rester publiques pour permettre l'accès initial
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         .anyRequest().authenticated()
+                )
+
+                // Gestion personnalisée de l'erreur d'authentification (401)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                            response.setContentType("application/json");
+                            response.getWriter().write("{ \"message\": \"Unauthorized\" }");
+                        })
                 )
 
                 // Le filtre JWT doit s'exécuter avant le filtre d'authentification standard
