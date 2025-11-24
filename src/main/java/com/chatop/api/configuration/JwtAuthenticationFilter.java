@@ -9,13 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Filtre de sécurité qui intercepte toutes les requêtes HTTP pour valider le token JWT.
@@ -56,16 +56,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Si le token est valide et que l'utilisateur n'est pas encore authentifié dans le contexte
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+            if (jwtService.isTokenValid(jwt, userEmail)) {
 
                 // Création de l'objet d'authentification.
                 // On passe 'null' pour le mot de passe car l'utilisateur est déjà validé par le token JWT.
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        userEmail,
                         null,
-                        userDetails.getAuthorities()
+                        List.of()
                 );
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
