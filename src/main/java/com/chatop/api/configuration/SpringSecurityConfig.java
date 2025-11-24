@@ -24,33 +24,26 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                // Désactivation CSRF car l'API est Stateless et n'utilise pas de cookies de session
-                .csrf(AbstractHttpConfigurer::disable)
-
-                // Politique Stateless : le serveur ne garde aucune session en mémoire.
-                // L'authentification dépend exclusivement du token JWT envoyé à chaque requête.
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable) // API Stateless : pas besoin de protection CSRF
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Pas de session serveur
 
                 .authorizeHttpRequests(auth -> auth
-                        // Les routes d'authentification doivent rester publiques pour permettre l'accès initial
+                        // Routes publiques (Auth + Documentation)
                         .requestMatchers("/api/auth/register", "/api/auth/login",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html").permitAll()
-                        .anyRequest().authenticated()
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .anyRequest().authenticated() // Toutes les autres routes nécessitent un token
                 )
 
-                // Gestion personnalisée de l'erreur d'authentification (401)
+                // Gestionnaire d'erreur pour renvoyer 401 (JSON) au lieu de 403 par défaut
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
                             response.getWriter().write("{ \"message\": \"Unauthorized\" }");
                         })
                 )
 
-                // Le filtre JWT doit s'exécuter avant le filtre d'authentification standard
-                // afin de valider le token et peupler le SecurityContextHolder en premier.
+                // Insertion du filtre JWT avant le filtre d'auth standard
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .build();

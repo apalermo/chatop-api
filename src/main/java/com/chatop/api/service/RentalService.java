@@ -25,6 +25,7 @@ public class RentalService {
 
     private final RentalRepository rentalRepository;
     private final UserRepository userRepository;
+    // Stockage local. En production, préférer un stockage externe.
     private static final String UPLOAD_DIR = "src/main/resources/static/images/";
 
     public List<RentalDto> getAllRentals() {
@@ -53,8 +54,6 @@ public class RentalService {
 
         rentalRepository.save(rental);
     }
-
-
 
 
     public void createRental(RentalCreationRequest request, MultipartFile picture, String userEmail) {

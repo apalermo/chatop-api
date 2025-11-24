@@ -14,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class RentalController {
                     content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"message\":\"Rental created !\"}"))),
             @ApiResponse(responseCode = "401", description = "Non autorisé", content = @Content(mediaType = "application/json"))
     })
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Map<String, String>> createRental(
             @ModelAttribute RentalCreationRequest request,
             Authentication authentication
@@ -68,7 +67,7 @@ public class RentalController {
                     content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"message\":\"Rental updated !\"}"))),
             @ApiResponse(responseCode = "401", description = "Non autorisé", content = @Content(mediaType = "application/json"))
     })
-    @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Map<String, String>> updateRental(@PathVariable Long id, @ModelAttribute RentalDto rentalDto) {
         rentalService.updateRental(id, rentalDto);
         return ResponseEntity.ok(Map.of("message", "Rental updated !"));

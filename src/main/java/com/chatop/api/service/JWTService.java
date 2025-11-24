@@ -33,7 +33,7 @@ public class JWTService {
     }
 
     // on surcharge la fonction pour qu'elle accepte une authentication (en plus de l'email)
-    public String generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication) {
         String email = authentication.getName();
         return generateToken(email);
     }

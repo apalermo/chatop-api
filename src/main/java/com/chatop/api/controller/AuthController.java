@@ -3,11 +3,9 @@ package com.chatop.api.controller;
 import com.chatop.api.dto.LoginRequest;
 import com.chatop.api.dto.RegisterRequest;
 import com.chatop.api.dto.UserDto;
-import com.chatop.api.repository.UserRepository;
 import com.chatop.api.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,7 +13,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,7 +35,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Données invalides",
                     content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"message\":\"Le format de l'email est invalide\"}")))
     })
-    @SecurityRequirements()
+    @SecurityRequirements() // Désactive la sécurité globale pour cette route publique
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
         String token = authService.register(request);
@@ -52,7 +49,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Erreur d'authentification",
                     content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"message\":\"Les identifications sont erronées\"}")))
     })
-    @SecurityRequirements()
+    @SecurityRequirements() // Désactive la sécurité globale pour cette route publique
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {
         String token = authService.login(request);
@@ -66,6 +63,7 @@ public class AuthController {
     })
     @GetMapping("/me")
     public ResponseEntity<UserDto> me() {
+        // Récupération de l'utilisateur connecté depuis le contexte de sécurité (peuplé par le filtre JWT)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDto userDto = authService.getCurrentUser(authentication.getName());
         return ResponseEntity.ok(userDto);

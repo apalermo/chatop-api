@@ -38,8 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        // Pas de token ou mauvais format : on laisse passer la requête.
-        // Si la route est protégée, Spring Security rejettera la requête plus loin (403).
+        // Si pas de header Authorization Bearer, on laisse passer (Spring Security bloquera plus loin si nécessaire)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -49,32 +48,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userEmail = jwtService.extractUsername(jwt);
         } catch (Exception e) {
-            // Le token est invalide (malformé, expiré, etc.)
-            // On ne fait rien et on laisse la requête continuer sans authentification
-            // Si la route est protégée, Spring renverra une 401/403 plus tard.
+            // Token invalide ou malformé : on ignore et on continue sans authentification
             filterChain.doFilter(request, response);
             return;
         }
 
-        // On ne procède à l'authentification que si l'utilisateur n'est pas déjà authentifié
-        // dans le contexte courant (évite de refaire le travail inutilement).
+        // Si le token est valide et que l'utilisateur n'est pas encore authentifié dans le contexte
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
 
-                // Création manuelle de l'authentification, car nous sommes en Stateless.
-                // On fait confiance au Token : pas besoin de vérifier le mot de passe ici.
+                // Création de l'objet d'authentification.
+                // On passe 'null' pour le mot de passe car l'utilisateur est déjà validé par le token JWT.
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
-                        null, // Credentials (mdp) laissés à null car déjà vérifiés lors de la génération du token
+                        null,
                         userDetails.getAuthorities()
                 );
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // Enregistrement de l'utilisateur dans le contexte de sécurité pour cette requête
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
