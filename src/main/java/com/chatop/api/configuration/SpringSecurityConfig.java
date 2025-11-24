@@ -30,7 +30,7 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Routes publiques (Auth + Documentation)
                         .requestMatchers("/api/auth/register", "/api/auth/login",
-                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/images/**").permitAll()
                         .anyRequest().authenticated() // Toutes les autres routes nécessitent un token
                 )
 

@@ -104,7 +104,7 @@ public class RentalService {
 
         // Retourner l'URL relative (accessible via http://localhost:3001/images/nom_fichier)
         // Note : Pour que ça marche, il faut que Spring soit configuré pour servir les ressources statiques
-        return "http://localhost:3001/api/images/" + fileName;
+        return "http://localhost:3001/images/" + fileName;
     }
 
     // Méthode utilitaire pour transformer l'entité en DTO
