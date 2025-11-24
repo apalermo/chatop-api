@@ -33,7 +33,10 @@ public class SpringSecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // Les routes d'authentification doivent rester publiques pour permettre l'accès initial
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
 
